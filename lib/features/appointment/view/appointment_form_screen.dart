@@ -14,6 +14,7 @@ import '../../services/model/service_model.dart';
 /// ===========================================================================
 class AppTheme {
   static const Color bgDark = Color(0xFF0F172A);
+  static const Color green = Colors.green;
   static const Color cardDark = Color(0xFF1E293B);
   static const Color inputBg = Color(0xFF0D1420);
 

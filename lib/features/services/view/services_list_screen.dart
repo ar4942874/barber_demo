@@ -16,27 +16,27 @@ class AppTheme {
   static const Color cardElevated = Color(0xFF273548);
   static const Color inputBg = Color(0xFF0D1420);
   static const Color inputFill = Color(0xFF1A1F2E);
-  
+
   // Improved Accent - Brighter, more visible gold
   static const Color accent = Color(0xFFFFB800);
   static const Color accentLight = Color(0xFFFFD54F);
   static const Color accentSoft = Color(0x26FFB800);
   static const Color accentGlow = Color(0x4DFFB800);
-  
+
   // Text
   static const Color textWhite = Colors.white;
   static const Color textGrey = Color(0xFF94A3B8);
   static const Color textMuted = Color(0xFF64748B);
-  
+
   // Status
   static const Color success = Color(0xFF22C55E);
   static const Color error = Color(0xFFEF4444);
   static const Color info = Color(0xFF3B82F6);
-  
+
   // Borders
   static const Color border = Color(0x1AFFFFFF);
   static const Color borderLight = Color(0x0DFFFFFF);
-  
+
   // Enhanced Shadows with white glow
   static List<BoxShadow> get cardShadow => [
     BoxShadow(
@@ -50,7 +50,7 @@ class AppTheme {
       spreadRadius: 0,
     ),
   ];
-  
+
   static List<BoxShadow> get cardHoverShadow => [
     BoxShadow(
       color: Colors.black.withOpacity(0.4),
@@ -62,13 +62,9 @@ class AppTheme {
       blurRadius: 30,
       spreadRadius: 2,
     ),
-    BoxShadow(
-      color: accent.withOpacity(0.08),
-      blurRadius: 20,
-      spreadRadius: 0,
-    ),
+    BoxShadow(color: accent.withOpacity(0.08), blurRadius: 20, spreadRadius: 0),
   ];
-  
+
   static List<BoxShadow> get whiteGlowShadow => [
     BoxShadow(
       color: Colors.white.withOpacity(0.08),
@@ -81,7 +77,7 @@ class AppTheme {
       spreadRadius: 0,
     ),
   ];
-  
+
   static List<BoxShadow> get buttonShadow => [
     BoxShadow(
       color: accent.withOpacity(0.4),
@@ -94,7 +90,7 @@ class AppTheme {
       offset: const Offset(0, 2),
     ),
   ];
-  
+
   static List<BoxShadow> get inputShadow => [
     BoxShadow(
       color: Colors.black.withOpacity(0.2),
@@ -102,18 +98,14 @@ class AppTheme {
       offset: const Offset(0, 3),
     ),
   ];
-  
+
   static List<BoxShadow> get inputFocusShadow => [
     BoxShadow(
       color: Colors.black.withOpacity(0.25),
       blurRadius: 12,
       offset: const Offset(0, 4),
     ),
-    BoxShadow(
-      color: accent.withOpacity(0.2),
-      blurRadius: 12,
-      spreadRadius: 0,
-    ),
+    BoxShadow(color: accent.withOpacity(0.2), blurRadius: 12, spreadRadius: 0),
   ];
 }
 
@@ -135,9 +127,9 @@ class _ServicesListScreenState extends ConsumerState<ServicesListScreen>
   bool _isSearchFocused = false;
   bool _isGridView = false;
   int _selectedFilter = 0;
-  
+
   final List<String> _filters = ['All', 'Active', 'Inactive'];
-  
+
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
 
@@ -147,7 +139,7 @@ class _ServicesListScreenState extends ConsumerState<ServicesListScreen>
     _searchFocus.addListener(() {
       setState(() => _isSearchFocused = _searchFocus.hasFocus);
     });
-    
+
     _fadeController = AnimationController(
       duration: const Duration(milliseconds: 600),
       vsync: this,
@@ -171,14 +163,14 @@ class _ServicesListScreenState extends ConsumerState<ServicesListScreen>
   Widget build(BuildContext context) {
     final servicesState = ref.watch(serviceControllerProvider);
     final screenWidth = MediaQuery.of(context).size.width;
-    
+
     // Responsive layout
     final isDesktop = screenWidth >= 1100;
     final isTablet = screenWidth >= 700 && screenWidth < 1100;
     final horizontalPadding = isDesktop ? 48.0 : (isTablet ? 32.0 : 20.0);
-    
+
     // Grid columns based on view mode
-    final crossAxisCount = _isGridView 
+    final crossAxisCount = _isGridView
         ? (isDesktop ? 3 : (isTablet ? 2 : 1))
         : 1;
 
@@ -194,29 +186,32 @@ class _ServicesListScreenState extends ConsumerState<ServicesListScreen>
               children: [
                 // Enhanced Header
                 _buildHeader(horizontalPadding),
-                
+
                 // Search Bar
                 _buildSearchBar(horizontalPadding),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Filter Chips + View Toggle
                 _buildFiltersAndToggle(horizontalPadding),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Content
                 Expanded(
                   child: servicesState.when(
-                    loading: () => _buildLoadingState(crossAxisCount, horizontalPadding),
+                    loading: () =>
+                        _buildLoadingState(crossAxisCount, horizontalPadding),
                     error: (e, _) => _ErrorState(message: e.toString()),
                     data: (services) {
                       var filtered = services
-                          .where((s) => s.name
-                              .toLowerCase()
-                              .contains(_query.toLowerCase()))
+                          .where(
+                            (s) => s.name.toLowerCase().contains(
+                              _query.toLowerCase(),
+                            ),
+                          )
                           .toList();
-                      
+
                       // Apply filter
                       if (_selectedFilter == 1) {
                         filtered = filtered.where((s) => s.isActive).toList();
@@ -228,7 +223,11 @@ class _ServicesListScreenState extends ConsumerState<ServicesListScreen>
                         return const _EmptyState();
                       }
 
-                      return _buildServicesList(filtered, crossAxisCount, horizontalPadding);
+                      return _buildServicesList(
+                        filtered,
+                        crossAxisCount,
+                        horizontalPadding,
+                      );
                     },
                   ),
                 ),
@@ -244,10 +243,9 @@ class _ServicesListScreenState extends ConsumerState<ServicesListScreen>
   /// ENHANCED HEADER WITH ICON
   /// ─────────────────────────────────────────────────────────────────────────
   Widget _buildHeader(double padding) {
-    final serviceCount = ref.watch(serviceControllerProvider).maybeWhen(
-          data: (services) => services.length,
-          orElse: () => 0,
-        );
+    final serviceCount = ref
+        .watch(serviceControllerProvider)
+        .maybeWhen(data: (services) => services.length, orElse: () => 0);
 
     return Container(
       margin: EdgeInsets.fromLTRB(padding, 20, padding, 16),
@@ -260,6 +258,11 @@ class _ServicesListScreenState extends ConsumerState<ServicesListScreen>
       ),
       child: Row(
         children: [
+          IconButton(
+            icon: Icon(Icons.arrow_back_ios),
+            color: AppTheme.textWhite,
+            onPressed: () => Navigator.of(context).pop(),
+          ),
           // Icon Container
           Container(
             padding: const EdgeInsets.all(12),
@@ -268,10 +271,7 @@ class _ServicesListScreenState extends ConsumerState<ServicesListScreen>
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  AppTheme.accent,
-                  AppTheme.accentLight,
-                ],
+                colors: [AppTheme.accent, AppTheme.accentLight],
               ),
               boxShadow: [
                 BoxShadow(
@@ -288,7 +288,7 @@ class _ServicesListScreenState extends ConsumerState<ServicesListScreen>
             ),
           ),
           const SizedBox(width: 20),
-          
+
           // Title Section
           Expanded(
             child: Column(
@@ -345,9 +345,7 @@ class _ServicesListScreenState extends ConsumerState<ServicesListScreen>
           ),
 
           // Add Button
-          _AddServiceButton(
-            onTap: () => _navigateToForm(),
-          ),
+          _AddServiceButton(onTap: () => _navigateToForm()),
         ],
       ),
     );
@@ -363,8 +361,8 @@ class _ServicesListScreenState extends ConsumerState<ServicesListScreen>
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
-          boxShadow: _isSearchFocused 
-              ? AppTheme.inputFocusShadow 
+          boxShadow: _isSearchFocused
+              ? AppTheme.inputFocusShadow
               : AppTheme.inputShadow,
         ),
         child: TextField(
@@ -381,10 +379,7 @@ class _ServicesListScreenState extends ConsumerState<ServicesListScreen>
             filled: true,
             fillColor: AppTheme.inputBg,
             hintText: 'Search services...',
-            hintStyle: const TextStyle(
-              color: AppTheme.textMuted,
-              fontSize: 15,
-            ),
+            hintStyle: const TextStyle(color: AppTheme.textMuted, fontSize: 15),
             prefixIcon: Icon(
               Icons.search_rounded,
               color: _isSearchFocused ? AppTheme.accent : AppTheme.textMuted,
@@ -442,7 +437,7 @@ class _ServicesListScreenState extends ConsumerState<ServicesListScreen>
                   final index = entry.key;
                   final filter = entry.value;
                   final isSelected = index == _selectedFilter;
-                  
+
                   return Padding(
                     padding: const EdgeInsets.only(right: 10),
                     child: GestureDetector(
@@ -490,9 +485,9 @@ class _ServicesListScreenState extends ConsumerState<ServicesListScreen>
               ),
             ),
           ),
-          
+
           const SizedBox(width: 16),
-          
+
           // View Toggle
           Container(
             decoration: BoxDecoration(
@@ -576,7 +571,7 @@ class _ServicesListScreenState extends ConsumerState<ServicesListScreen>
         itemBuilder: (context, index) => const _SkeletonListCard(),
       );
     }
-    
+
     return GridView.builder(
       padding: EdgeInsets.fromLTRB(padding, 0, padding, 24),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -599,13 +594,13 @@ class _ServicesListScreenState extends ConsumerState<ServicesListScreen>
           return FadeTransition(
             opacity: animation,
             child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0.03, 0),
-                end: Offset.zero,
-              ).animate(CurvedAnimation(
-                parent: animation,
-                curve: Curves.easeOut,
-              )),
+              position:
+                  Tween<Offset>(
+                    begin: const Offset(0.03, 0),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(parent: animation, curve: Curves.easeOut),
+                  ),
               child: child,
             ),
           );
@@ -690,10 +685,7 @@ class _AddServiceButtonState extends State<_AddServiceButton> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                AppTheme.accent,
-                AppTheme.accentLight,
-              ],
+              colors: [AppTheme.accent, AppTheme.accentLight],
             ),
             borderRadius: BorderRadius.circular(12),
             boxShadow: _isHovered
@@ -789,13 +781,13 @@ class _ServiceListCardState extends State<_ServiceListCard>
               color: AppTheme.cardDark,
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: _isHovered 
-                    ? AppTheme.accent.withOpacity(0.4) 
+                color: _isHovered
+                    ? AppTheme.accent.withOpacity(0.4)
                     : AppTheme.border,
                 width: _isHovered ? 1.5 : 1,
               ),
-              boxShadow: _isHovered 
-                  ? AppTheme.cardHoverShadow 
+              boxShadow: _isHovered
+                  ? AppTheme.cardHoverShadow
                   : AppTheme.cardShadow,
             ),
             child: Material(
@@ -854,25 +846,29 @@ class _ServiceListCardState extends State<_ServiceListCard>
                           ),
                         ],
                       ),
-                      
+
                       const SizedBox(height: 16),
-                      
+
                       // Tags Row
                       Row(
                         children: [
-                          _CategoryTag(text: _extractCategory(widget.service.name)),
+                          _CategoryTag(
+                            text: _extractCategory(widget.service.name),
+                          ),
                           const SizedBox(width: 10),
-                          _DurationBadge(duration: widget.service.durationMinutes),
+                          _DurationBadge(
+                            duration: widget.service.durationMinutes,
+                          ),
                         ],
                       ),
-                      
+
                       const SizedBox(height: 16),
-                      
+
                       // Divider
                       Container(height: 1, color: AppTheme.border),
-                      
+
                       const SizedBox(height: 14),
-                      
+
                       // Footer
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -985,13 +981,13 @@ class _ServiceGridCardState extends State<_ServiceGridCard>
               color: AppTheme.cardDark,
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: _isHovered 
-                    ? AppTheme.accent.withOpacity(0.4) 
+                color: _isHovered
+                    ? AppTheme.accent.withOpacity(0.4)
                     : AppTheme.border,
                 width: _isHovered ? 1.5 : 1,
               ),
-              boxShadow: _isHovered 
-                  ? AppTheme.cardHoverShadow 
+              boxShadow: _isHovered
+                  ? AppTheme.cardHoverShadow
                   : AppTheme.cardShadow,
             ),
             child: Material(
@@ -1010,9 +1006,15 @@ class _ServiceGridCardState extends State<_ServiceGridCard>
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _ServiceIcon(serviceName: widget.service.name, size: 44),
+                          _ServiceIcon(
+                            serviceName: widget.service.name,
+                            size: 44,
+                          ),
                           const Spacer(), // ✅ OK here because GridView provides bounded height
-                          _StatusBadge(isActive: widget.service.isActive, compact: true),
+                          _StatusBadge(
+                            isActive: widget.service.isActive,
+                            compact: true,
+                          ),
                           const SizedBox(width: 4),
                           _ActionMenu(
                             onEdit: () => _navigateToEdit(),
@@ -1020,9 +1022,9 @@ class _ServiceGridCardState extends State<_ServiceGridCard>
                           ),
                         ],
                       ),
-                      
+
                       const SizedBox(height: 14),
-                      
+
                       // Title
                       Text(
                         widget.service.name,
@@ -1035,9 +1037,9 @@ class _ServiceGridCardState extends State<_ServiceGridCard>
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      
+
                       const SizedBox(height: 6),
-                      
+
                       // Description - Expanded to take remaining space
                       Expanded(
                         child: Text(
@@ -1053,17 +1055,20 @@ class _ServiceGridCardState extends State<_ServiceGridCard>
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      
+
                       // Divider
                       Container(height: 1, color: AppTheme.border),
-                      
+
                       const SizedBox(height: 12),
-                      
+
                       // Footer
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _DurationBadge(duration: widget.service.durationMinutes, compact: true),
+                          _DurationBadge(
+                            duration: widget.service.durationMinutes,
+                            compact: true,
+                          ),
                           _PriceTag(price: widget.service.price, compact: true),
                         ],
                       ),
@@ -1127,9 +1132,7 @@ class _ServiceIcon extends StatelessWidget {
             AppTheme.accentLight.withOpacity(0.1),
           ],
         ),
-        border: Border.all(
-          color: AppTheme.accent.withOpacity(0.3),
-        ),
+        border: Border.all(color: AppTheme.accent.withOpacity(0.3)),
         boxShadow: [
           BoxShadow(
             color: AppTheme.accent.withOpacity(0.15),
@@ -1148,11 +1151,14 @@ class _ServiceIcon extends StatelessWidget {
 
   IconData _getIconForService(String name) {
     final lower = name.toLowerCase();
-    if (lower.contains('hair') || lower.contains('cut')) return Icons.content_cut;
+    if (lower.contains('hair') || lower.contains('cut'))
+      return Icons.content_cut;
     if (lower.contains('spa') || lower.contains('massage')) return Icons.spa;
     if (lower.contains('nail')) return Icons.brush;
-    if (lower.contains('facial') || lower.contains('skin')) return Icons.face_retouching_natural;
-    if (lower.contains('makeup') || lower.contains('beauty')) return Icons.auto_awesome;
+    if (lower.contains('facial') || lower.contains('skin'))
+      return Icons.face_retouching_natural;
+    if (lower.contains('makeup') || lower.contains('beauty'))
+      return Icons.auto_awesome;
     return Icons.design_services;
   }
 }
@@ -1177,9 +1183,7 @@ class _CategoryTag extends StatelessWidget {
             AppTheme.accentLight.withOpacity(0.1),
           ],
         ),
-        border: Border.all(
-          color: AppTheme.accent.withOpacity(0.35),
-        ),
+        border: Border.all(color: AppTheme.accent.withOpacity(0.35)),
         boxShadow: [
           BoxShadow(
             color: AppTheme.accent.withOpacity(0.15),
@@ -1336,9 +1340,7 @@ class _PriceTag extends StatelessWidget {
             AppTheme.accentLight.withOpacity(0.08),
           ],
         ),
-        border: Border.all(
-          color: AppTheme.accent.withOpacity(0.3),
-        ),
+        border: Border.all(color: AppTheme.accent.withOpacity(0.3)),
         boxShadow: [
           BoxShadow(
             color: AppTheme.accent.withOpacity(0.2),
@@ -1354,10 +1356,7 @@ class _PriceTag extends StatelessWidget {
           fontWeight: FontWeight.w800,
           color: AppTheme.accent,
           shadows: [
-            Shadow(
-              color: AppTheme.accent.withOpacity(0.3),
-              blurRadius: 4,
-            ),
+            Shadow(color: AppTheme.accent.withOpacity(0.3), blurRadius: 4),
           ],
         ),
       ),
@@ -1372,10 +1371,7 @@ class _ActionMenu extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
-  const _ActionMenu({
-    required this.onEdit,
-    required this.onDelete,
-  });
+  const _ActionMenu({required this.onEdit, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -1398,9 +1394,19 @@ class _ActionMenu extends StatelessWidget {
         if (value == 'delete') onDelete();
       },
       itemBuilder: (_) => [
-        _buildMenuItem('edit', Icons.edit_outlined, 'Edit Service', AppTheme.textWhite),
+        _buildMenuItem(
+          'edit',
+          Icons.edit_outlined,
+          'Edit Service',
+          AppTheme.textWhite,
+        ),
         const PopupMenuDivider(height: 1),
-        _buildMenuItem('delete', Icons.delete_outline_rounded, 'Delete', AppTheme.error),
+        _buildMenuItem(
+          'delete',
+          Icons.delete_outline_rounded,
+          'Delete',
+          AppTheme.error,
+        ),
       ],
     );
   }
@@ -1506,10 +1512,7 @@ class _SkeletonListCardState extends State<_SkeletonListCard>
               const SizedBox(height: 14),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildShimmer(60, 20, 6),
-                  _buildShimmer(50, 24, 6),
-                ],
+                children: [_buildShimmer(60, 20, 6), _buildShimmer(50, 24, 6)],
               ),
             ],
           ),
@@ -1593,17 +1596,12 @@ class _SkeletonGridCardState extends State<_SkeletonGridCard>
               const SizedBox(height: 14),
               _buildShimmer(double.infinity, 16, 6),
               const SizedBox(height: 6),
-              Expanded(
-                child: _buildShimmer(100, 12, 6),
-              ),
+              Expanded(child: _buildShimmer(100, 12, 6)),
               Container(height: 1, color: AppTheme.border),
               const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildShimmer(50, 20, 6),
-                  _buildShimmer(45, 22, 6),
-                ],
+                children: [_buildShimmer(50, 20, 6), _buildShimmer(45, 22, 6)],
               ),
             ],
           ),
@@ -1639,10 +1637,7 @@ class _DeleteDialog extends StatelessWidget {
   final String serviceName;
   final VoidCallback onConfirm;
 
-  const _DeleteDialog({
-    required this.serviceName,
-    required this.onConfirm,
-  });
+  const _DeleteDialog({required this.serviceName, required this.onConfirm});
 
   @override
   Widget build(BuildContext context) {
@@ -1819,10 +1814,7 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 8),
           const Text(
             "Create your first service or adjust filters",
-            style: TextStyle(
-              fontSize: 14,
-              color: AppTheme.textMuted,
-            ),
+            style: TextStyle(fontSize: 14, color: AppTheme.textMuted),
           ),
         ],
       ),
@@ -1877,10 +1869,7 @@ class _ErrorState extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppTheme.textMuted,
-              ),
+              style: const TextStyle(fontSize: 14, color: AppTheme.textMuted),
             ),
           ],
         ),

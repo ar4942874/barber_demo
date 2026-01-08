@@ -1,5 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
+const Color loginConColor = Colors.purple;
+
+BorderRadius borderRadius = BorderRadius.circular(10);
+BorderRadius borderRadius13=BorderRadius.circular(13);
+Color borderColor = Color(0xFFD6D6D6);
+
+class AdminDashboardColor {
+  // Header Gradient
+  static const Color headerGradientStart = Color(0xFF536CE4);
+  static const Color headerGradientEnd = Color(0xFF8045D8);
+
+  // Text  Color
+  static const Color titleTextColor = Color(0xFF1E293B);
+  static const Color subTextColor = Color(0xFF64748B);
+  static const Color cardBorderColor = Color(0xFFD6D6D6);
+
+  // 1. Appointments (Blue) Color
+  static const Color bluebackGroundColor = Color(0xFFE4EDFF);
+  static const Color blueIconColor = Color(0xFF3B82F6);
+
+  // 2. Revenue (Green) Color
+  static const Color greenBackgroundColor = Color(0xFFDFFCE5);
+  static const Color greenIcon = Color(0xFF22C55E);
+
+  // 3. Walk-ins (Purple) Color
+  static const Color purpleBackgroundColor = Color(0xFFF2E7FE);
+  static const Color purpleIcon = Color(0xFF9333EA);
+
+  // 4. Completed (Orange) Color
+  static const Color orangeBackgroundColor = Color(0xFFFFEDD5);
+  static const Color orangeIconColor = Color(0xFFF97316);
+}
+
+class AdminAppointmentCalendarColor {
+  static const Color primaryPurple = Color(0xFF8B3DFF);
+  static const Color lightPurpleBg = Color(0xFFF3E8FF);
+  static const Color textDark = Color(0xFF1F2937);
+  static const Color textGrey = Color(0xFF9CA3AF);
+  static const Color greenAccent = Color(0xFF10B981);
+  static const Color greenBg = Color(0xFFD1FAE5);
+  static const Color blueAccent = Color(0xFF3B82F6);
+  static const Color blueBg = Color(0xFFDBEAFE);
+  static const Color purpleAccent = Color(0xFF8B5CF6);
+}
 class AppColors {
   static const background = Color(0xFFF5F7FA);
   static const sidebar = Color(0xFF1A202C);
@@ -15,17 +60,17 @@ class AppColors {
   static const border = Color(0xFFE5E7EB);
 }
 
-class AdminAppointmentCalendarColor {
-  static const Color primaryPurple = Color(0xFF8B3DFF);
-  static const Color lightPurpleBg = Color(0xFFF3E8FF);
-  static const Color textDark = Color(0xFF1F2937);
-  static const Color textGrey = Color(0xFF9CA3AF);
-  static const Color greenAccent = Color(0xFF10B981);
-  static const Color greenBg = Color(0xFFD1FAE5);
-  static const Color blueAccent = Color(0xFF3B82F6);
-  static const Color blueBg = Color(0xFFDBEAFE);
-  static const Color purpleAccent = Color(0xFF8B5CF6);
-}
+// class AdminAppointmentCalendarColor {
+//   static const Color primaryPurple = Color(0xFF8B3DFF);
+//   static const Color lightPurpleBg = Color(0xFFF3E8FF);
+//   static const Color textDark = Color(0xFF1F2937);
+//   static const Color textGrey = Color(0xFF9CA3AF);
+//   static const Color greenAccent = Color(0xFF10B981);
+//   static const Color greenBg = Color(0xFFD1FAE5);
+//   static const Color blueAccent = Color(0xFF3B82F6);
+//   static const Color blueBg = Color(0xFFDBEAFE);
+//   static const Color purpleAccent = Color(0xFF8B5CF6);
+// }
 
 class AppPallete {
   // --- RICH BACKGROUNDS ---

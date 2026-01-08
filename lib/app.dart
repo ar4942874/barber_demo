@@ -14,6 +14,7 @@
 //   }
 // }
 import 'package:barber_demo/features/appointment/view/appointment_screen.dart';
+import 'package:barber_demo/features/auth/view/admin_login.dart';
 import 'package:flutter/material.dart';
 import 'features/services/view/services_list_screen.dart';
 
@@ -83,7 +84,7 @@ class BarberShopAdminApp extends StatelessWidget {
       ),
 
       // Start with Services Feature
-      home: const AppointmentScreen(),
+      home: const AdminLoginScreen(),
     );
   }
 }

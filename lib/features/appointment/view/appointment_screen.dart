@@ -39,37 +39,34 @@ class AppTheme {
 
   // Shadows
   static List<BoxShadow> get cardShadow => [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.3),
-          blurRadius: 15,
-          offset: const Offset(0, 8),
-        ),
-        BoxShadow(
-          color: Colors.white.withOpacity(0.03),
-          blurRadius: 20,
-        ),
-      ];
+    BoxShadow(
+      color: Colors.black.withOpacity(0.3),
+      blurRadius: 15,
+      offset: const Offset(0, 8),
+    ),
+    BoxShadow(color: Colors.white.withOpacity(0.03), blurRadius: 20),
+  ];
 
   static List<BoxShadow> get cardHoverShadow => [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.4),
-          blurRadius: 25,
-          offset: const Offset(0, 12),
-        ),
-        BoxShadow(
-          color: Colors.white.withOpacity(0.06),
-          blurRadius: 30,
-          spreadRadius: 2,
-        ),
-      ];
+    BoxShadow(
+      color: Colors.black.withOpacity(0.4),
+      blurRadius: 25,
+      offset: const Offset(0, 12),
+    ),
+    BoxShadow(
+      color: Colors.white.withOpacity(0.06),
+      blurRadius: 30,
+      spreadRadius: 2,
+    ),
+  ];
 
   static List<BoxShadow> get whiteGlowShadow => [
-        BoxShadow(
-          color: Colors.white.withOpacity(0.08),
-          blurRadius: 25,
-          spreadRadius: 1,
-        ),
-      ];
+    BoxShadow(
+      color: Colors.white.withOpacity(0.08),
+      blurRadius: 25,
+      spreadRadius: 1,
+    ),
+  ];
 
   // Status color helper
   static Color getStatusColor(AppointmentStatus status) {
@@ -110,7 +107,7 @@ class _AppointmentScreenState extends ConsumerState<AppointmentScreen>
     'Confirmed',
     'In Progress',
     'Completed',
-    'Cancelled'
+    'Cancelled',
   ];
 
   @override
@@ -120,8 +117,10 @@ class _AppointmentScreenState extends ConsumerState<AppointmentScreen>
       duration: const Duration(milliseconds: 600),
       vsync: this,
     );
-    _fadeAnimation =
-        CurvedAnimation(parent: _fadeController, curve: Curves.easeOut);
+    _fadeAnimation = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeOut,
+    );
     _fadeController.forward();
   }
 
@@ -169,8 +168,10 @@ class _AppointmentScreenState extends ConsumerState<AppointmentScreen>
 
                 // Appointments List
                 Expanded(
-                  child:
-                      _buildAppointmentsList(horizontalPadding, appointmentsAsync),
+                  child: _buildAppointmentsList(
+                    horizontalPadding,
+                    appointmentsAsync,
+                  ),
                 ),
               ],
             ),
@@ -200,6 +201,12 @@ class _AppointmentScreenState extends ConsumerState<AppointmentScreen>
           // Title Row
           Row(
             children: [
+              IconButton(
+                icon: Icon(Icons.arrow_back_rounded),
+                onPressed: () => Navigator.pop(context),
+                color: AppTheme.textMuted,
+              ),
+              SizedBox(width: 8),
               // Icon
               Container(
                 padding: const EdgeInsets.all(12),
@@ -253,9 +260,7 @@ class _AppointmentScreenState extends ConsumerState<AppointmentScreen>
               ),
 
               // Add Button
-              _AddAppointmentButton(
-                onTap: () => _navigateToForm(),
-              ),
+              _AddAppointmentButton(onTap: () => _navigateToForm()),
             ],
           ),
 
@@ -349,8 +354,10 @@ class _AppointmentScreenState extends ConsumerState<AppointmentScreen>
                 onTap: () => setState(() => _selectedFilter = index),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     color: isSelected ? AppTheme.accent : AppTheme.cardDark,
@@ -398,8 +405,9 @@ class _AppointmentScreenState extends ConsumerState<AppointmentScreen>
         if (_selectedFilter > 0) {
           final statusFilter = _getStatusFromFilter(_selectedFilter);
           if (statusFilter != null) {
-            filtered =
-                appointments.where((a) => a.status == statusFilter).toList();
+            filtered = appointments
+                .where((a) => a.status == statusFilter)
+                .toList();
           }
         }
 
@@ -510,9 +518,8 @@ class _AppointmentScreenState extends ConsumerState<AppointmentScreen>
   Future<void> _confirmDelete(AppointmentModel appointment) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (_) => _DeleteConfirmDialog(
-        customerName: appointment.customerName,
-      ),
+      builder: (_) =>
+          _DeleteConfirmDialog(customerName: appointment.customerName),
     );
 
     if (confirm == true) {
@@ -571,10 +578,7 @@ class _StatCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               label,
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppTheme.textMuted,
-              ),
+              style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
             ),
           ],
         ),
@@ -620,10 +624,12 @@ class _HorizontalDatePickerState extends State<_HorizontalDatePicker> {
   }
 
   void _scrollToSelectedDate() {
-    final index = _dates.indexWhere((d) =>
-        d.year == widget.selectedDate.year &&
-        d.month == widget.selectedDate.month &&
-        d.day == widget.selectedDate.day);
+    final index = _dates.indexWhere(
+      (d) =>
+          d.year == widget.selectedDate.year &&
+          d.month == widget.selectedDate.month &&
+          d.day == widget.selectedDate.day,
+    );
 
     if (index != -1 && _scrollController.hasClients) {
       _scrollController.animateTo(
@@ -658,10 +664,12 @@ class _HorizontalDatePickerState extends State<_HorizontalDatePicker> {
         itemCount: _dates.length,
         itemBuilder: (context, index) {
           final date = _dates[index];
-          final isSelected = date.year == widget.selectedDate.year &&
+          final isSelected =
+              date.year == widget.selectedDate.year &&
               date.month == widget.selectedDate.month &&
               date.day == widget.selectedDate.day;
-          final isToday = date.year == DateTime.now().year &&
+          final isToday =
+              date.year == DateTime.now().year &&
               date.month == DateTime.now().month &&
               date.day == DateTime.now().day;
 
@@ -686,8 +694,8 @@ class _HorizontalDatePickerState extends State<_HorizontalDatePicker> {
                     color: isToday && !isSelected
                         ? AppTheme.accent.withOpacity(0.5)
                         : isSelected
-                            ? Colors.transparent
-                            : AppTheme.border,
+                        ? Colors.transparent
+                        : AppTheme.border,
                     width: isToday && !isSelected ? 2 : 1,
                   ),
                   boxShadow: isSelected
@@ -708,8 +716,7 @@ class _HorizontalDatePickerState extends State<_HorizontalDatePicker> {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        color:
-                            isSelected ? Colors.black : AppTheme.textMuted,
+                        color: isSelected ? Colors.black : AppTheme.textMuted,
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -718,8 +725,7 @@ class _HorizontalDatePickerState extends State<_HorizontalDatePicker> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color:
-                            isSelected ? Colors.black : AppTheme.textWhite,
+                        color: isSelected ? Colors.black : AppTheme.textWhite,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -776,12 +782,11 @@ class _AppointmentCardState extends State<_AppointmentCard> {
           color: AppTheme.cardDark,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: _isHovered
-                ? statusColor.withOpacity(0.5)
-                : AppTheme.border,
+            color: _isHovered ? statusColor.withOpacity(0.5) : AppTheme.border,
           ),
-          boxShadow:
-              _isHovered ? AppTheme.cardHoverShadow : AppTheme.cardShadow,
+          boxShadow: _isHovered
+              ? AppTheme.cardHoverShadow
+              : AppTheme.cardShadow,
         ),
         child: Material(
           color: Colors.transparent,
@@ -795,8 +800,10 @@ class _AppointmentCardState extends State<_AppointmentCard> {
                   // Time Column
                   Container(
                     width: 70,
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: AppTheme.inputBg,
                       borderRadius: BorderRadius.circular(12),
@@ -1117,8 +1124,11 @@ class _AppointmentDetailsSheet extends StatelessWidget {
                         color: statusColor.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      child:
-                          Icon(Icons.person_rounded, color: statusColor, size: 28),
+                      child: Icon(
+                        Icons.person_rounded,
+                        color: statusColor,
+                        size: 28,
+                      ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -1292,7 +1302,10 @@ class _AppointmentDetailsSheet extends StatelessWidget {
                     Expanded(
                       child: ElevatedButton.icon(
                         onPressed: onDelete,
-                        icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                        icon: const Icon(
+                          Icons.delete_outline_rounded,
+                          size: 18,
+                        ),
                         label: const Text("Delete"),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.error,
@@ -1576,10 +1589,7 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 8),
           const Text(
             "Tap the button above to add a new appointment",
-            style: TextStyle(
-              fontSize: 14,
-              color: AppTheme.textMuted,
-            ),
+            style: TextStyle(fontSize: 14, color: AppTheme.textMuted),
             textAlign: TextAlign.center,
           ),
         ],
