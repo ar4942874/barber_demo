@@ -2,6 +2,7 @@
 
 import 'package:barber_demo/features/billing/view/bill_histroy/bill_history_screen.dart';
 import 'package:barber_demo/features/billing/view/walk_in_billing_screen.dart';
+import 'package:barber_demo/features/reporting/view/reporting_screen.dart';
 import 'package:barber_demo/features/services/view/services_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -412,7 +413,7 @@ class AdminDashboardScreen extends ConsumerWidget {
         subtitle: "View analytics & reports",
         icon: Icons.analytics_rounded,
         color: AppTheme.purpleLight,
-        onTap: () => _showComingSoon(context, "Reports & Analysis"),
+        onTap: () => Navigator.of( context).push(MaterialPageRoute(builder: (context) => ReportingScreen(),)),
       ),
       // _QuickActionData(
       //   title: "Branch Management",
