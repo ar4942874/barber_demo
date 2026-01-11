@@ -207,6 +207,7 @@ class AppointmentController extends StateNotifier<AsyncValue<List<AppointmentMod
     _ref.invalidate(upcomingAppointmentsProvider);
     _ref.invalidate(allAppointmentsProvider);
   }
+  
 }
 
 /// Controller Provider

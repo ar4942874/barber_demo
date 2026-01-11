@@ -2,56 +2,31 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import '../model/billing_model.dart';
+import 'package:uuid/uuid.dart';
+
+import '../../appointment/controller/appointment_controller.dart';
+import '../../appointment/model/appointment_model.dart';
 import '../../services/model/service_model.dart';
+import '../model/billing_model.dart';
+import '../repository/billing_repository.dart';
 
-class BillingState {
-  final String customerName;
-  final String customerPhone;
-  final List<BillItemModel> items;
-  final double taxRate;
-  final double discountAmount;
-  final bool isLoading;
+/// Provider for the BillingController.
+/// It now depends on the repository and another controller.
+final billingControllerProvider = StateNotifierProvider<BillingController, BillingState>((ref) {
+  return BillingController(
+    ref.watch(billingRepositoryProvider),
+    ref.watch(appointmentControllerProvider.notifier),
+  );
+});
 
-  const BillingState({
-    this.customerName = '',
-    this.customerPhone = '',
-    this.items = const [],
-    this.taxRate = 0.08,
-    this.discountAmount = 0.0,
-    this.isLoading = false,
-  });
-
-  double get subtotal => items.fold(0.0, (sum, item) => sum + item.totalPrice);
-  double get taxAmount => subtotal * taxRate;
-  double get total => subtotal + taxAmount - discountAmount;
-  int get totalDuration => items.fold(0, (sum, item) => sum + item.durationMinutes * item.quantity);
-  bool get hasItems => items.isNotEmpty;
-  bool get hasCustomer => customerName.isNotEmpty;
-  int get itemCount => items.fold(0, (sum, item) => sum + item.quantity);
-
-  BillingState copyWith({
-    String? customerName,
-    String? customerPhone,
-    List<BillItemModel>? items,
-    double? taxRate,
-    double? discountAmount,
-    bool? isLoading,
-  }) {
-    return BillingState(
-      customerName: customerName ?? this.customerName,
-      customerPhone: customerPhone ?? this.customerPhone,
-      items: items ?? this.items,
-      taxRate: taxRate ?? this.taxRate,
-      discountAmount: discountAmount ?? this.discountAmount,
-      isLoading: isLoading ?? this.isLoading,
-    );
-  }
-}
 
 class BillingController extends StateNotifier<BillingState> {
-  BillingController() : super(const BillingState());
+  final BillingRepository _billingRepository;
+  final AppointmentController _appointmentController;
 
+  BillingController(this._billingRepository, this._appointmentController) : super(BillingState());
+
+  // --- Customer Info Methods ---
   void setCustomerName(String name) {
     state = state.copyWith(customerName: name);
   }
@@ -60,22 +35,20 @@ class BillingController extends StateNotifier<BillingState> {
     state = state.copyWith(customerPhone: phone);
   }
 
+  // --- Item Management Methods ---
   void addService(ServiceModel service) {
     final existingIndex = state.items.indexWhere((item) => item.serviceId == service.id);
 
     if (existingIndex != -1) {
+      // If service already exists, just increase its quantity
       final updatedItems = List<BillItemModel>.from(state.items);
       updatedItems[existingIndex] = updatedItems[existingIndex].copyWith(
         quantity: updatedItems[existingIndex].quantity + 1,
       );
       state = state.copyWith(items: updatedItems);
     } else {
-      final newItem = BillItemModel(
-        serviceId: service.id,
-        serviceName: service.name,
-        durationMinutes: service.durationMinutes,
-        price: service.price,
-      );
+      // Add a new item from the service model
+      final newItem = BillItemModel.fromService(service);
       state = state.copyWith(items: [...state.items, newItem]);
     }
   }
@@ -99,27 +72,77 @@ class BillingController extends StateNotifier<BillingState> {
     );
   }
 
-  void setDiscount(double amount) {
-    state = state.copyWith(discountAmount: amount);
-  }
-
-  Future<void> saveAsDraft() async {
-    state = state.copyWith(isLoading: true);
-    await Future.delayed(const Duration(milliseconds: 500));
-    state = state.copyWith(isLoading: false);
-  }
-
-  Future<void> finalizeBill(PaymentMethod method) async {
-    state = state.copyWith(isLoading: true);
-    await Future.delayed(const Duration(milliseconds: 500));
-    state = state.copyWith(isLoading: false);
-  }
-
+  /// Clears the current bill from the UI, ready for a new transaction.
   void clearBill() {
-    state = const BillingState();
+    state = BillingState();
   }
-}
 
-final billingControllerProvider = StateNotifierProvider<BillingController, BillingState>((ref) {
-  return BillingController();
-});
+  // --- Workflow Methods ---
+
+  /// Pre-fills the billing UI state from a given appointment.
+  /// This is called before navigating to the billing screen.
+  void populateBillFromAppointment(
+    AppointmentModel appointment,
+    List<ServiceModel> appointmentServices,
+  ) {
+    clearBill(); // Start with a fresh state
+
+    // Set customer details from the appointment
+    setCustomerName(appointment.customerName);
+    setCustomerPhone(appointment.customerPhone);
+
+    // Add all services from the appointment
+    for (final service in appointmentServices) {
+      addService(service);
+    }
+
+    // IMPORTANT: Link this bill state to the appointment ID
+    state = state.copyWith(linkedAppointmentId: appointment.id);
+  }
+
+  /// Finalizes the current bill, saves it to the database, and updates
+  /// the linked appointment's status if applicable.
+  Future<void> finalizeBill(PaymentMethod method) async {
+    if (!state.hasItems) {
+      throw Exception("Cannot finalize an empty bill.");
+    }
+    
+    try {
+      // 1. Construct the persistent BillModel from the current UI state.
+      final billToSave = BillModel(
+        id: const Uuid().v4(),
+        billNumber: await _billingRepository.getNextBillNumber(),
+        appointmentId: state.linkedAppointmentId,
+        customerName: state.customerName,
+        customerPhone: state.customerPhone,
+        subtotal: state.subtotal,
+        taxAmount: state.taxAmount,
+        discountAmount: state.discountAmount,
+        total: state.total,
+        paymentMethod: method,
+        createdAt: DateTime.now(),
+        items: state.items,
+      );
+
+      // 2. Save the bill to the database via the repository.
+      await _billingRepository.saveBill(billToSave);
+
+      // 3. If this bill was from an appointment, update the appointment's status.
+      if (billToSave.appointmentId != null) {
+        await _appointmentController.updateStatus(
+          billToSave.appointmentId!,
+          AppointmentStatus.completed,
+        );
+      }
+      
+      // 4. Clear the UI for the next transaction.
+      clearBill();
+
+    } catch (e) {
+      // Rethrow the exception to be caught and displayed by the UI.
+      
+      rethrow;
+    }
+  }
+ 
+}

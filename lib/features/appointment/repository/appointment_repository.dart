@@ -277,21 +277,16 @@ class AppointmentRepository {
   // ─────────────────────────────────────────────────────────────────────────
   // UPDATE STATUS
   // ─────────────────────────────────────────────────────────────────────────
-  Future<void> updateStatus(String id, AppointmentStatus status) async {
-    final db = await _dbHelper.database;
-    await db.update(
-      DbConstants.tableAppointments,
-      {
-        DbConstants.colStatus: status.name,
-        DbConstants.colUpdatedAt: DateTime.now().toIso8601String(),
-        DbConstants.colIsSynced: 0,
-      },
-      where: '${DbConstants.colId} = ?',
-      whereArgs: [id],
-    );
-    print("✅ Appointment status updated to: ${status.name}");
-  }
-
+// In AppointmentRepository.dart
+Future<void> updateStatus(String id, AppointmentStatus status) async {
+  final db = await _dbHelper.database; // Assuming you have a db helper
+  await db.update(
+    DbConstants.tableAppointments,
+    {DbConstants.colStatus: status.name},
+    where: '${DbConstants.colId} = ?',
+    whereArgs: [id],
+  );
+}
   // ─────────────────────────────────────────────────────────────────────────
   // DELETE
   // ─────────────────────────────────────────────────────────────────────────
@@ -421,6 +416,17 @@ class AppointmentRepository {
       {DbConstants.colIsSynced: 1},
       where: '${DbConstants.colId} = ?',
       whereArgs: [id],
+    );
+  }
+
+  /// Updates only the status of a specific appointment.
+  Future<void> updateAppointmentStatus(String appointmentId, AppointmentStatus newStatus) async {
+    final db = await _dbHelper.database;
+    await db.update(
+      DbConstants.tableAppointments,
+      {DbConstants.colStatus: newStatus.name}, // The data to update
+      where: '${DbConstants.colId} = ?', // The condition to find the row
+      whereArgs: [appointmentId],
     );
   }
 }

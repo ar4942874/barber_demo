@@ -1,8 +1,8 @@
 // lib/features/dashboard/view/admin_dashboard_screen.dart
 
+import 'package:barber_demo/features/billing/view/bill_histroy/bill_history_screen.dart';
 import 'package:barber_demo/features/billing/view/walk_in_billing_screen.dart';
 import 'package:barber_demo/features/services/view/services_list_screen.dart';
-import 'package:barber_demo/features/walkin_billing/view/admin_walkin_billing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -405,7 +405,7 @@ class AdminDashboardScreen extends ConsumerWidget {
         subtitle: "View & manage bills",
         icon: Icons.receipt_long_rounded,
         color: AppTheme.pink,
-        onTap: () => _showComingSoon(context, "Bill Management"),
+        onTap: () =>Navigator.of( context).push(MaterialPageRoute(builder: (context) => BillHistoryScreen(),)),
       ),
       _QuickActionData(
         title: "Reports & Analysis",
